@@ -1,4 +1,7 @@
 Inductive Var := x | y.
+
+(* Sintaxa limbajului RCode++ *)
+
 Inductive AExp :=
 | anum : nat -> AExp
 | avar : Var -> AExp
@@ -16,3 +19,12 @@ Notation "A %' B" := (amod A B) (at level 46).
 
 Coercion anum : nat >-> AExp.
 Coercion avar : Var >-> AExp.
+Compute 1 +' 5.
+Inductive BExp :=
+| btrue : BExp
+| bfalse : BExp
+| bnot : BExp -> BExp
+| band : BExp -> BExp -> BExp
+| blessthan : AExp -> AExp -> BExp
+| bgreaterthan : AExp -> AExp -> BExp.
+
