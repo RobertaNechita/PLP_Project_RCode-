@@ -1,10 +1,23 @@
-Inductive Var := x | y.
 
 (* Sintaxa limbajului RCode++ *)
 
-Inductive AExp :=
+Require Import String.
+Local Open Scope string_scope.
+Scheme Equality for string.
+
+(* Declararea tipurilor de variabile  *)
+Inductive ValueType :=
+| undef : ValueType
+| nat_val : nat -> ValueType
+| bool_val : bool -> ValueType
+| string_val : string -> ValueType. 
+
+
+Scheme Equality for ValueType.
+
+Inductive AExp := 
 | anum : nat -> AExp
-| avar : Var -> AExp
+| avar : ValueType -> AExp
 | aplus : AExp -> AExp -> AExp
 | asub : AExp -> AExp -> AExp
 | amul : AExp -> AExp -> AExp
@@ -18,8 +31,11 @@ Notation "A /' B" := (adiv A B) (at level 46).
 Notation "A %' B" := (amod A B) (at level 46).
 
 Coercion anum : nat >-> AExp.
-Coercion avar : Var >-> AExp.
-Compute 1 +' 5.
+Coercion avar : ValueType >-> AExp.
+
+(*Enviorments*)
+Definition Env := ValueType -> nat.
+
 Inductive BExp :=
 | btrue : BExp
 | bfalse : BExp
@@ -27,4 +43,3 @@ Inductive BExp :=
 | band : BExp -> BExp -> BExp
 | blessthan : AExp -> AExp -> BExp
 | bgreaterthan : AExp -> AExp -> BExp.
-
