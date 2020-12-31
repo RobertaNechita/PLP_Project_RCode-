@@ -142,9 +142,160 @@ Definition update (env : Env ) ( S : string ) ( v : Value_Result) : Env :=
 
 (*                              teste                             *)
 
-
+Compute (env "x").
 Compute (update (update env "x" (DEFAULT)) "x" (bool_val true) "x").
+Compute (update env "a" (nat_val 100)) "a".
 
+Notation "S [ V \' X ]" := (update S V X) (at level 0).  
+
+
+
+(*                         expresii aritmetice                          *)
+
+
+Inductive AExp :=
+| avar: Errstring -> AExp 
+| anum: Errnat -> AExp
+| aplus: AExp -> AExp -> AExp
+| amin: AExp -> AExp -> AExp
+| amul: AExp -> AExp -> AExp 
+| adiv: AExp -> AExp -> AExp 
+| amodulo: AExp -> AExp -> AExp.
+
+Coercion anum: Errnat >-> AExp.
+Coercion avar: Errstring >-> AExp.
+
+
+(*                     notatii operatii artimetice                      *)
+
+Notation "A +' B" := (aplus A B)(at level 50, left associativity).
+Notation "A -' B" := (amin A B)(at level 50, left associativity).
+Notation "A *' B" := (amul A B)(at level 48, left associativity).
+Notation "A /' B" := (adiv A B)(at level 48, left associativity).
+Notation "A %' B" := (amodulo A B)(at level 45, left associativity).
+
+ 
+
+(*                 functii de calcul operatii aritmetice ce trateaza erori                  *)
+
+
+Definition plus_ErrorNat (n1 n2 : Errnat) : Errnat :=
+  match n1, n2 with
+    | error_nat, _ => error_nat
+    | _, error_nat => error_nat
+    | number v1, number v2 => number (v1 + v2)
+    end.
+
+
+Definition sub_ErrorNat (n1 n2 : Errnat) : Errnat :=
+  match n1, n2 with
+    | error_nat, _ => error_nat
+    | _, error_nat => error_nat
+    | number n1, number n2 => if Nat.ltb n1 n2
+                        then error_nat
+                        else number (n1 - n2)
+    end.
+
+
+Definition mul_ErrorNat (n1 n2 : Errnat) : Errnat :=
+  match n1, n2 with
+    | error_nat, _ => error_nat
+    | _, error_nat => error_nat
+    | number v1, number v2 => number (v1 * v2)
+    end.
+
+
+Definition div_ErrorNat (n1 n2 : Errnat) : Errnat :=
+  match n1, n2 with
+    | error_nat, _ => error_nat
+    | _, error_nat => error_nat
+    | _, number 0 => error_nat
+    | number v1, number v2 => number (Nat.div v1 v2)
+    end.
+
+
+Definition mod_ErrorNat (n1 n2 : Errnat) : Errnat :=
+  match n1, n2 with
+    | error_nat, _ => error_nat
+    | _, error_nat => error_nat
+    | _, number 0 => error_nat
+    | number v1, number v2 => number (v1 - v2 * (Nat.div v1 v2))
+    end.
+
+
+(*                 teste                      *)
+Compute ( plus_ErrorNat 5 6 ).
+Compute (div_ErrorNat (plus_ErrorNat 14 6) (mul_ErrorNat 5 2)).
+
+ 
+(*                         expresii booleene                          *)
+
+Inductive BExp :=
+| berror
+| btrue
+| bfalse
+| bvar: string -> BExp
+| blt : AExp -> AExp -> BExp
+| bgt : AExp -> AExp -> BExp
+| bnot : BExp -> BExp
+| band : BExp -> BExp -> BExp
+| bor : BExp -> BExp -> BExp.
+
+(*                     notatii operatii booleene                      *)
+
+Notation "A <' B" := (blt A B) (at level 70).
+Notation "A >' B" := (bgt A B) (at level 70).
+Notation "!' A" := (bnot A)(at level 51, left associativity).
+Notation "A &&' B" := (band A B)(at level 52, left associativity).
+Notation "A ||' B" := (bor A B)(at level 53, left associativity).
+
+
+(*                 functii de calcul operatii booleene ce trateaza erori                  *)
+
+Definition lt_ErrorBool (n1 n2 : Errnat) : Errbool :=
+  match n1, n2 with
+    | error_nat, _ => error_bool
+    | _, error_nat => error_bool
+    | number v1, number v2 => boolean (Nat.ltb v1 v2)
+    end.
+
+
+Definition gt_ErrorBool (n1 n2 : Errnat) : Errbool :=
+  match n1, n2 with
+    | error_nat, _ => error_bool
+    | _, error_nat => error_bool
+    | number v1, number v2 => boolean (Nat.ltb v2 v1)
+    end.
+
+
+Definition not_ErrorBool (n :Errbool) : Errbool :=
+  match n with
+    | error_bool => error_bool
+    | boolean v => boolean (negb v)
+    end.
+
+
+Definition and_ErrorBool (n1 n2 : Errbool) : Errbool :=
+  match n1, n2 with
+    | error_bool, _ => error_bool
+    | _, error_bool => error_bool
+    | boolean v1, boolean v2 => boolean (andb v1 v2)
+    end.
+
+
+Definition or_ErrorBool (n1 n2 : Errbool) : Errbool :=
+  match n1, n2 with
+    | error_bool, _ => error_bool
+    | _, error_bool => error_bool
+    | boolean v1, boolean v2 => boolean (orb v1 v2)
+    end.
+
+
+(*                 teste                      *)
+
+
+Compute or_ErrorBool true false.
+Compute and_ErrorBool (lt_ErrorBool 10 12) (gt_ErrorBool 2 4).
 
 
 
