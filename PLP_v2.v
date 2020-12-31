@@ -31,7 +31,7 @@ Coercion str : string >-> Errstring.
 Compute eqb "an" "ax".
 Compute eqb "a" "a".
 
-(*        functiile strcat & strlen & strcmp        *)
+(*        functiile ajutatoare strcat & strlen & strcmp        *)
 
 Fixpoint STRLEN (sir1 : string) : nat :=
 match sir1 with
@@ -297,7 +297,63 @@ Definition or_ErrorBool (n1 n2 : Errbool) : Errbool :=
 Compute or_ErrorBool true false.
 Compute and_ErrorBool (lt_ErrorBool 10 12) (gt_ErrorBool 2 4).
 
+(*              statement-uri                   *)
+Inductive Stmt :=
+| nat_decl: string ->  Stmt  
+| bool_decl: string -> Stmt 
+| struct_decl : string ->Stmt -> Stmt
+| string_decl : string ->Stmt
+| nat_assign : string -> AExp -> Stmt 
+| bool_assign : string -> BExp -> Stmt 
+| string_assign : string -> string ->Stmt
+| sequence : Stmt -> Stmt -> Stmt
+| while : BExp -> Stmt -> Stmt
+| ifthenelse : BExp -> Stmt -> Stmt -> Stmt
+| ifthen : BExp -> Stmt -> Stmt
+| case : Errnat -> Stmt -> Stmt
+| switch_case : AExp -> Stmt -> Stmt
+| Copy_string : string -> string -> Stmt
+| Cat_string : string -> string -> Stmt.
 
+
+
+(*                     notatii                        *)
+Notation "X :n= A" := (nat_assign X A)(at level 90).
+Notation "X :b= A" := (bool_assign X A)(at level 90).
+Notation "X :s= A" := (string_assign X A)(at level 90).
+Notation "'iNat' X ::= A" := (nat_decl X A)(at level 90).
+Notation "'iBool' X ::= A" := (bool_decl X A)(at level 90).
+Notation "'iStr' X " := (string_decl X) (at level 90).
+Notation "'Struct' X {' S }" := (struct_decl X S) (at level 90).
+Notation "S1 ;; S2" := (sequence S1 S2) (at level 93, right associativity).
+Notation "'WHILE' (' B ) {' S }" := (while B S) (at level 93).
+Notation "'IF' (' B ) 'THEN' {' S } 'ELSE' {' S2 }" := (ifthenelse B S S2) (at level 93).
+Notation "'IF' (' B ) 'THEN' {' S }" := (ifthen B S)( at level 93).
+Notation "'FOR' ( A ~ B ~ C ) { S }" := (A ;; while B (S ;; C)) (at level 97).
+Notation "'Strcpy' (' S1 , S2 )":= (Copy_string S1 S2) (at level 93).
+Notation "'Strcat' (' S1 , S2 )":= (Cat_string S1 S2) (at level 93).
+Notation "'Case' (' A ) {' S }" := (case A S) (at level 95).
+Notation "'Switch' (' A ) : S " := (switch_case A S) ( at level 93).
+
+
+(*                 stabilire particulara a valorii default in fct de tipul de date            *)
+
+
+Definition result_default_value (n: nat) : Value_Result :=
+match n with
+ | 1 => nat_val 0 
+ | 2 => bool_val true
+ | 3 => string_val "" 
+ | _ => DEFAULT
+end.
+
+Definition declare_type (s: Stmt) : nat :=
+match s with
+| nat_decl n => 1
+| bool_decl b=> 2
+| string_decl s => 3
+| _ => 0
+end.
 
 
 
