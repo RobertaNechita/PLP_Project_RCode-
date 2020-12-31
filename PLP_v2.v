@@ -356,6 +356,15 @@ match s with
 end.
 
 
+(*Declaratia tipului de date struct*)
+Definition struct_concat (s1 s2 :string) : string :=
+ STRCAT (STRCAT s1 ".") s2.
+
+Compute struct_concat "plp" "Proiect".
+
+Compute (update env (struct_concat "PLP" "project") DEFAULT) "PLP.project".
+
+
 
 
 
