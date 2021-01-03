@@ -427,7 +427,51 @@ Compute head[12 ; 4 ; 6].
 Compute last[3 ; 5 ; 32 ; 1 ].
 Compute removeLAST[ 4 ; 3 ; 5 ].
 
+(*                        referinte                *)
 
+Inductive Mem := 
+| mem_default : Mem
+| offset: nat -> Mem. 
+
+Scheme Equality for Mem.
+
+Definition MemEnv := string -> Mem.
+Definition MemLayer := Mem -> Value_Result.
+Definition Stack := list MemEnv.
+Inductive Configuratie :=
+|config : nat -> MemEnv -> MemLayer -> Stack -> Configuratie.
+
+(*                     update memorie /daca variabila are asignata zona default de memorie ii se atribuie un offset                  *)
+ Definition update_env ( env : MemEnv)(x : string) (n: Mem) : MemEnv :=
+fun y =>
+        if( andb (string_beq x y) (Mem_beq (env y) mem_default))
+        then n
+        else (env y).
+(*                    intial toate variabilele primesc o zona default de memorie             *)
+
+Definition env_default : MemEnv := fun x => mem_default.
+
+Compute (env_default "x").
+Compute (update_env env_default "x" (offset 0)) "x".
+
+
+Definition update_memLayer (mem : MemLayer) (env : MemEnv) (x : string)( type : Mem)(v :Value_Result) : MemLayer :=
+fun y =>
+  if(andb (Mem_beq y type ) (Mem_beq (env x) type))
+  then 
+    if(andb (check_equality_types ERR_undec (mem y)) (negb (check_equality_types DEFAULT v)))
+    then ERR_undec
+    else if(andb (check_equality_types ERR_undec (mem y)) (check_equality_types DEFAULT v))
+    then DEFAULT
+    else
+        if(orb (check_equality_types DEFAULT (mem y)) (check_equality_types DEFAULT v))
+        then v
+        else ERR_assign
+    else (mem y).
+
+(*   fiecare nume de variabila mapeaza intial catre undec  *)
+
+Definition mem : MemLayer := fun x=> ERR_undec.
 
 
 
