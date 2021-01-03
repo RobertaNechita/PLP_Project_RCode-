@@ -154,7 +154,7 @@ Notation "S [ V \' X ]" := (update S V X) (at level 0).
 
 
 Inductive AExp :=
-| avar: Errstring -> AExp 
+| avar: string -> AExp 
 | anum: Errnat -> AExp
 | aplus: AExp -> AExp -> AExp
 | amin: AExp -> AExp -> AExp
