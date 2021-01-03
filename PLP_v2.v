@@ -66,7 +66,7 @@ Inductive Value_Result :=
 |DEFAULT : Value_Result
 |nat_val : Errnat -> Value_Result
 |bool_val : Errbool -> Value_Result
-|string_val : Errstring -> Value_Result.
+|string_val : string -> Value_Result.
 
 
 
@@ -160,10 +160,11 @@ Inductive AExp :=
 | amin: AExp -> AExp -> AExp
 | amul: AExp -> AExp -> AExp 
 | adiv: AExp -> AExp -> AExp 
+| alength: string -> AExp
 | amodulo: AExp -> AExp -> AExp.
 
 Coercion anum: Errnat >-> AExp.
-Coercion avar: Errstring >-> AExp.
+Coercion avar: string >-> AExp.
 
 
 (*                     notatii operatii artimetice                      *)
@@ -221,11 +222,17 @@ Definition mod_ErrorNat (n1 n2 : Errnat) : Errnat :=
     | _, number 0 => error_nat
     | number v1, number v2 => number (v1 - v2 * (Nat.div v1 v2))
     end.
-
+    
+Definition len_ErrorNat (r: Value_Result) : Errnat :=
+match r with
+ | string_val s => STRLEN s
+ | _ =>0
+end.
 
 (*                 teste                      *)
 Compute ( plus_ErrorNat 5 6 ).
 Compute (div_ErrorNat (plus_ErrorNat 14 6) (mul_ErrorNat 5 2)).
+Compute len_ErrorNat (string_val "plp").
 
  
 (*                         expresii booleene                          *)
