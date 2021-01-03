@@ -367,11 +367,15 @@ Compute struct_concat "plp" "Proiect".
 Compute (update env (struct_concat "PLP" "project") DEFAULT) "PLP.project".
 
 (*                     implemetare liste                  *)
-Inductive Elem:=
-|last: nat ->Stmt->Elem
-|push:nat->Stmt->Elem->Elem.
+Inductive ListElem:=
+|nil : ListElem
+|push:nat->ListElem->ListElem.
 
-Notation " '[' A ']' " := ( push A)(at level 96).
+Notation " [ ] " := ( nil )(at level 96).   (*lista vida*)
+Notation " [ x ] " := ( push x nil)(at level 96).   (*lista cu un elem*)
+Notation " [ x ; .. ; y ] " := (push x .. (push y nil) ..)(at level 80).
+Compute [ 10 ; 12 ; 3 ].
+Compute [ ].
 
 
 
