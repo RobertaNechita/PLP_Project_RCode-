@@ -380,7 +380,6 @@ Inductive ListElem:=
 
 Notation "x :: l" := (push x l)(at level 60, right associativity).
 Notation " [ ] " := ( nil )(at level 96).   (*lista vida*)
-Notation " [ x ] " := ( push x nil)(at level 96).   (*lista cu un elem*)
 Notation " [ x ; .. ; y ] " := (push x .. (push y nil) ..)(at level 80).
 Compute [ 10 ; 12 ; 3 ].
 Compute [ ].
