@@ -425,6 +425,7 @@ Compute len[ 13 ; 7 ; 23 ; 4 ].
 Compute [ 12 ; 4] concat [ 1 ; 2 ; 4].
 Compute head[12 ; 4 ; 6].
 Compute last[3 ; 5 ; 32 ; 1 ].
+Compute removeLAST[ 4 ; 3 ; 5 ].
 
 
 
