@@ -377,6 +377,45 @@ Notation " [ x ; .. ; y ] " := (push x .. (push y nil) ..)(at level 80).
 Compute [ 10 ; 12 ; 3 ].
 Compute [ ].
 
+Definition head_of_list (l : ListElem) : nat :=
+  match l with
+  | nil => 0
+  | h :: t => h
+  end.
+
+Fixpoint length_of_list (l:ListElem) : nat :=
+    match l with
+      | nil => 0
+      | _ :: m => S (length_of_list m)
+    end.
+
+Fixpoint concatenate (l1 l2 : ListElem) : ListElem :=
+  match l1 with
+  | nil => l2
+  | h :: t => h :: (concatenate t l2)
+  end.
+
+ Fixpoint last_of_list (l:ListElem) : nat :=
+  match l with
+    | [] => 0
+    | [a] => a
+    | a :: l => last_of_list l 
+  end.
+
+(*                  notatii                  *)
+
+Notation " 'len' L " := (length_of_list L)(at level 0).
+Notation " L' 'concat' L " := (concatenate L' L)(at level 0).
+Notation " 'head' L " := (head_of_list L)(at level 0).
+Notation " 'last' L" := (last_of_list L)(at level 0).
+
+
+(*                 teste                    *)
+Compute len[ 12 ; 3 ].
+Compute len[ 13 ; 7 ; 23 ; 4 ].
+Compute [ 12 ; 4] concat [ 1 ; 2 ; 4].
+Compute head[12 ; 4 ; 6].
+Compute last[3 ; 5 ; 32 ; 1 ].
 
 
 
