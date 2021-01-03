@@ -401,6 +401,14 @@ Fixpoint concatenate (l1 l2 : ListElem) : ListElem :=
     | [a] => a
     | a :: l => last_of_list l 
   end.
+  
+  
+Fixpoint removelast (l: ListElem) : ListElem :=
+    match l with
+      | [] => []
+      | [a] => []
+      | a :: l => a :: removelast l
+    end.
 
 (*                  notatii                  *)
 
@@ -408,6 +416,7 @@ Notation " 'len' L " := (length_of_list L)(at level 0).
 Notation " L' 'concat' L " := (concatenate L' L)(at level 0).
 Notation " 'head' L " := (head_of_list L)(at level 0).
 Notation " 'last' L" := (last_of_list L)(at level 0).
+Notation " 'removeLAST' L " := (removelast L)(at level 0).
 
 
 (*                 teste                    *)
