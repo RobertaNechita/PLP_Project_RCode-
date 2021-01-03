@@ -472,8 +472,8 @@ fun y =>
     then DEFAULT
     else
         if(orb (check_equality_types DEFAULT (mem y)) (check_equality_types DEFAULT v))
-        then v
-        else ERR_assign
+        then ERR_assign
+        else v
     else (mem y).
 
 (*   fiecare nume de variabila mapeaza intial catre undec  *)
