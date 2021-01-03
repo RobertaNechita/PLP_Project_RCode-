@@ -313,7 +313,9 @@ Inductive Stmt :=
 | case : Errnat -> Stmt -> Stmt
 | switch_case : AExp -> Stmt -> Stmt
 | Copy_string : string -> string -> Stmt
-| Cat_string : string -> string -> Stmt.
+| Cat_string : string -> string -> Stmt
+| break : Stmt -> Stmt 
+| while_break : BExp -> Stmt -> Stmt. 
 
 
 
@@ -364,7 +366,12 @@ Compute struct_concat "plp" "Proiect".
 
 Compute (update env (struct_concat "PLP" "project") DEFAULT) "PLP.project".
 
+(*                     implemetare liste                  *)
+Inductive Elem:=
+|last: nat ->Stmt->Elem
+|push:nat->Stmt->Elem->Elem.
 
+Notation " '[' A ']' " := ( push A)(at level 96).
 
 
 
