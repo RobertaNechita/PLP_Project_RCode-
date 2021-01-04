@@ -222,7 +222,8 @@ Definition mod_ErrorNat (n1 n2 : Errnat) : Errnat :=
     | _, number 0 => error_nat
     | number v1, number v2 => number (v1 - v2 * (Nat.div v1 v2))
     end.
-    
+  
+  (*                operatii pe string uri folosindu-ma de tip0ul Value_Result      *)
 Definition len_ErrorNat (r: Value_Result) : Errnat :=
 match r with
  | string_val s => STRLEN s
@@ -339,7 +340,7 @@ Notation "'WHILE' (' B ) {' S }" := (while B S) (at level 93).
 Notation "'IF' (' B ) 'THEN' {' S } 'ELSE' {' S2 }" := (ifthenelse B S S2) (at level 93).
 Notation "'IF' (' B ) 'THEN' {' S }" := (ifthen B S)( at level 93).
 Notation "'FOR' ( A ~ B ~ C ) { S }" := (A ;; while B (S ;; C)) (at level 97).
-Notation "'Strcpy' (' S1 , S2 )":= (Copy_string S1 S2) (at level 93).
+Notation "'Strcpy' (' S1 , S2 )":= (Copy_string S1 S2) (at level 93).   ( *    operatii pe string uri *)
 Notation "'Strcat' (' S1 , S2 )":= (Cat_string S1 S2) (at level 93).
 Notation "'Case' (' A ) {' S }" := (case A S) (at level 95).
 Notation "'Switch' (' A ) : S " := (switch_case A S) ( at level 93).
