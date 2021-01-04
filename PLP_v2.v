@@ -485,7 +485,16 @@ Notation " 'ref' A" := ( (update_env env_default A (offset 6)) "a" ) (at level 0
 Compute ref"x".
 Compute ref"a".
 
-
+(*Definition reference (x :string)( env :MemEnv) :MemEnv:=
+fun y =>
+    if( andb (string_beq x y) (Mem_beq (env y) mem_default))
+      then if (  eqb x "a" )
+           then offset 1
+           else if (  eqb x "b" )
+                then offset 2
+                else offset 3
+      else (env y).
+*)
 
 
 
