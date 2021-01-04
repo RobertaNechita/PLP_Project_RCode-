@@ -480,7 +480,10 @@ fun y =>
 
 Definition mem : MemLayer := fun x=> ERR_undec.
 
+Notation " 'ref' A" := ( (update_env env_default A (offset 6)) "a" ) (at level 0).
 
+Compute ref"x".
+Compute ref"a".
 
 
 
