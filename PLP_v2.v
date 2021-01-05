@@ -63,6 +63,7 @@ Compute strlen( "result.is.12" ).
 Inductive Value_Result :=
 |ERR_undec : Value_Result
 |ERR_assign : Value_Result
+|ERR_string :Value_Result
 |DEFAULT : Value_Result
 |nat_val : Errnat -> Value_Result
 |bool_val : Errbool -> Value_Result
@@ -113,6 +114,10 @@ match type1 with
                  |string_val n => true
                  | _ => false
                 end  
+|ERR_string => match type2 with
+               |ERR_string => true
+               | _ => false
+               end                
 end.   
 
 (*                              teste                             *)
@@ -223,18 +228,10 @@ Definition mod_ErrorNat (n1 n2 : Errnat) : Errnat :=
     | number v1, number v2 => number (v1 - v2 * (Nat.div v1 v2))
     end.
   
-  (*                operatii pe string uri folosindu-ma de tip0ul Value_Result      *)
-Definition len_ErrorNat (r: Value_Result) : Errnat :=
-match r with
- | string_val s => STRLEN s
- | _ =>0
-end.
 
 (*                 teste                      *)
 Compute ( plus_ErrorNat 5 6 ).
 Compute (div_ErrorNat (plus_ErrorNat 14 6) (mul_ErrorNat 5 2)).
-Compute len_ErrorNat (string_val "plp").
-
  
 (*                         expresii booleene                          *)
 
@@ -304,6 +301,22 @@ Definition or_ErrorBool (n1 n2 : Errbool) : Errbool :=
 
 Compute or_ErrorBool true false.
 Compute and_ErrorBool (lt_ErrorBool 10 12) (gt_ErrorBool 2 4).
+
+(*      operatii pe string uri -v2                *)
+
+Definition len_ErrorNat (r: Value_Result) : Errnat :=
+match r with
+ | string_val s => STRLEN s
+ | _ =>0
+end.
+
+Compute len_ErrorNat (string_val "plp").
+
+Definition CONCAT (s1 s2 : Value_Result) : Value_Result :=
+match s1 ,s2 with
+|string_val sir1, string_val sir2 => string_val (STRCAT sir1 sir2)
+|_,_=> ERR_string
+end.
 
 (*              statement-uri                   *)
 Inductive Stmt :=
