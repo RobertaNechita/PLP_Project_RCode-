@@ -358,6 +358,9 @@ Notation "'Strcat' (' S1 , S2 )":= (Cat_string S1 S2) (at level 93).
 Notation "'Case' (' A ) {' S }" := (case A S) (at level 95).
 Notation "'Switch' (' A ) : S " := (switch_case A S) ( at level 93).
 
+Compute iStr "a".
+Compute Strcat (' "a" , "b").
+
 
 (*                 stabilire particulara a valorii default in fct de tipul de date            *)
 
