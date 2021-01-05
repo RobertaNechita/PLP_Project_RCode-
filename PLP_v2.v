@@ -311,12 +311,18 @@ match r with
 end.
 
 Compute len_ErrorNat (string_val "plp").
+Notation "'len' S" := (len_ErrorNat S)(at level 0).
+Compute len (string_val "test").
 
 Definition CONCAT (s1 s2 : Value_Result) : Value_Result :=
 match s1 ,s2 with
 |string_val sir1, string_val sir2 => string_val (STRCAT sir1 sir2)
 |_,_=> ERR_string
 end.
+
+Compute CONCAT (string_val "test") ( string_val "plp") .
+Notation " S +str+ S' " := (CONCAT S S')(at level 0).
+Compute (string_val "Proiect") +str+ (string_val "PLP").
 
 (*              statement-uri                   *)
 Inductive Stmt :=
