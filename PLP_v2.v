@@ -338,11 +338,7 @@ Inductive Stmt :=
 | ifthenelse : BExp -> Stmt -> Stmt -> Stmt
 | ifthen : BExp -> Stmt -> Stmt
 | case : Errnat -> Stmt -> Stmt
-| switch_case : AExp -> Stmt -> Stmt
-| Copy_string : string -> string -> Stmt
-| Cat_string : string -> string -> Stmt
-| break : Stmt -> Stmt 
-| while_break : BExp -> Stmt -> Stmt. 
+| switch_case : AExp -> Stmt -> Stmt. 
 
 
 
@@ -520,6 +516,163 @@ fun y =>
 *)
 
 
+(*                              Semantica                                   *)
+
+(*evaluare expresii aritmetice*)
+Fixpoint aeval_fun (a : AExp) (env : Env) : Errnat :=
+  match a with
+  | avar v => match (env v) with
+                | nat_val n => n
+                | _ => error_nat
+                end
+  | anum v => v
+  | aplus a1 a2 => (plus_ErrorNat (aeval_fun a1 env) (aeval_fun a2 env))
+  | amul a1 a2 => (mul_ErrorNat (aeval_fun a1 env) (aeval_fun a2 env))
+  | amin a1 a2 => (sub_ErrorNat (aeval_fun a1 env) (aeval_fun a2 env))
+  | adiv a1 a2 => (div_ErrorNat  (aeval_fun a1 env) (aeval_fun a2 env))
+  | alength S1 => len_ErrorNat (env S1)
+  | amodulo a1 a2 => (mod_ErrorNat (aeval_fun a1 env) (aeval_fun a2 env))
+  
+  end.
+  
+(*teste*)
+Compute aeval_fun ("var" +' 3) (update (update env "var" (DEFAULT)) "var" (nat_val 17) ).
+Compute aeval_fun ( STRLEN ("abcd" ) +' 5 ) env.
+
+
+(*evaluare expresii booleane*)
+Fixpoint beval_fun (a : BExp) (env : Env) : Errbool :=
+  match a with
+  | btrue => true
+  | bfalse => false
+  | berror => error_bool
+  | bvar v => match (env v) with
+                | bool_val n => n
+                | _ => error_bool
+                end
+  | blt a1 a2 => (lt_ErrorBool (aeval_fun a1 env) (aeval_fun a2 env))
+  | bgt a1 a2 => (gt_ErrorBool (aeval_fun a1 env) (aeval_fun a2 env))
+  | bnot b1 => (not_ErrorBool (beval_fun b1 env))
+  | band b1 b2 => (and_ErrorBool (beval_fun b1 env) (beval_fun b2 env))
+  | bor b1 b2 => (or_ErrorBool (beval_fun b1 env) (beval_fun b2 env))
+  end.
+
+
+(*evaluare declarare struct*)
+Fixpoint struct_is_declared ( env : Env) (s: string) (stm : Stmt) : Env :=
+match stm with
+ | nat_decl x => update (update env (struct_concat s x) DEFAULT) (struct_concat s x) (nat_val 0)
+ | bool_decl x => update (update env (struct_concat s x) DEFAULT) (struct_concat s x) (bool_val true) 
+ | string_decl x => update (update env (struct_concat s x) DEFAULT) (struct_concat s x) (string_val "")
+ | sequence b c =>if(Nat.ltb 0 (declare_type b))
+                  then match b with
+                       | nat_decl x => struct_is_declared (update (update env (struct_concat s x) DEFAULT) (struct_concat s x) (nat_val 0) ) s c
+                       | bool_decl x => struct_is_declared (update (update env (struct_concat s x) DEFAULT) (struct_concat s x) (bool_val true) ) s c
+                       | string_decl x => struct_is_declared (update (update env (struct_concat s x) DEFAULT) (struct_concat s x) (string_val "") ) s c
+                       | _ => env
+                       end
+                  else env
+ 
+ | _ => env
+end.
+
+
+(*test*)
+Compute (struct_is_declared env "plp" (  iStr "proj" ) ) "plp.proj".
+
+
+(*evaluare statement-uri*)
+Fixpoint eval_fun (s : Stmt) (env : Env) (gas: nat) : Env :=
+    match gas with
+    | 0 => env
+    | S gas' => match s with
+                | nat_decl a => update (update env a DEFAULT) a (nat_val 0)
+                | bool_decl b => update (update env b DEFAULT) b (bool_val true)
+                | string_decl s => update env s DEFAULT 
+                | struct_decl s n =>struct_is_declared env s n
+                | nat_assign a aexp => update env a (nat_val (aeval_fun aexp env))
+                | bool_assign b bexp => update env b (bool_val (beval_fun bexp env))
+                | string_assign s word => update env s (string_val word)
+
+                | sequence S1 S2 => eval_fun S2 (eval_fun S1 env gas') gas'
+                
+                | ifthen cond s' => 
+                    match (beval_fun cond env) with
+                    | error_bool => env
+                    | boolean v => match v with
+                                 | true => eval_fun s' env gas'
+                                 | false => env
+                                 end
+                    end
+                | ifthenelse cond S1 S2 => 
+                    match (beval_fun cond env) with
+                        | error_bool => env
+                        | boolean v  => match v with
+                                 | true => eval_fun S1 env gas'
+                                 | false => eval_fun S2 env gas'
+                                 end
+                         end
+                | while cond s' => 
+                    match (beval_fun cond env) with
+                        | error_bool => env
+                        | boolean v => match v with
+                                     | true => eval_fun (s' ;; (while cond s')) env gas'
+                                     | false => env
+                                     end
+                        end
+                | case n St =>eval_fun St env gas'
+               
+                | switch_case ArithExp C =>
+                                 match C with
+                                         | case n Stm => if(Errnat_beq n (aeval_fun ArithExp env))  
+                                                       then eval_fun Stm env gas'
+                                                        else env
+                                         | sequence S1 S2 => match S1 with    
+                                                              | case n Stm => if(Errnat_beq n (aeval_fun ArithExp env))  
+                                                                            then eval_fun Stm env gas'   
+                                                                            else eval_fun (switch_case ArithExp S2) env gas'
+                                                               | _ => env
+                                                                end
+                                         | _ => env
+                                 end
+              
+                end
+    end.
 
 
  
+ 
+(*                                teste                                       *)
+Definition Switch_verif :=
+ iNat "num1" ;;
+ iNat "num2" ;;
+ iStr "msg" ;;
+ "msg":s= "Hello_WORLD" ;;
+"num1" :n= 7 %' 4 ;;
+Switch ('"num1" -' 1 ) : 
+Case ('2) {' "num2" :n= 3};;
+Case ('6) {' "num2" :n= 8};;
+Case ('10) {' "num2" :n= 13}.
+
+Compute (eval_fun Switch_verif env 100) "num".
+Compute (eval_fun Switch_verif env 100) "num2".
+Compute (eval_fun Switch_verif env 100) "msg".
+Compute (eval_fun Switch_verif env 100) "num1".
+
+Definition Struct_verif :=
+iStr "Elev" ;;
+iStr "s2" ;;
+Struct "Elev" {' iNat "nota" ;; iStr "curs" }.
+
+Compute (eval_fun Struct_verif env 100 ) "Elev.curs".
+Compute (eval_fun Struct_verif env 100 ) "Elev.nota".
+
+Definition prg_test1 :=
+iNat "num";;
+iBool "verif";;
+"verif" :b= btrue;;
+ "num" :n=12 ;;
+ IF ('"num" >' 7 ) THEN {' "num" :n= 3 ;; "verif" :b= bfalse  }.
+
+Compute (eval_fun prg_test1 env 100) "num".
+Compute (eval_fun prg_test1 env 100) "verif".
