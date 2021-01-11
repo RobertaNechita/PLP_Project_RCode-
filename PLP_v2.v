@@ -662,10 +662,11 @@ Compute (eval_fun Switch_verif env 100) "num1".
 Definition Struct_verif :=
 iStr "Elev" ;;
 iStr "s2" ;;
-Struct "Elev" {' iNat "nota" ;; iStr "curs" }.
+Struct "Elev" {' iNat "nota" ;; iStr "curs" ;; iBool "validID" }.
 
 Compute (eval_fun Struct_verif env 100 ) "Elev.curs".
 Compute (eval_fun Struct_verif env 100 ) "Elev.nota".
+Compute (eval_fun Struct_verif env 100 ) "Elev.validID".
 
 Definition prg_test1 :=
 iNat "num";;
